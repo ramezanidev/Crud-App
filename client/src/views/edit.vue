@@ -1,5 +1,5 @@
 <template>
-  <AppForm label="Edit User" :userId="userId" @submit="submit"/>
+  <AppForm label="Edit User" :userId="userId" @submit="submit" />
 </template>
 
 
@@ -14,11 +14,12 @@ export default defineComponent({
   },
   setup() {
     const route = useRoute();
+
     const userId = route.params.id as string;
-    const submit = (e:any) => console.log(e);
+    const submit = (e: any) => console.log(e);
     return {
       userId,
-      submit
+      submit,
     };
   },
 });

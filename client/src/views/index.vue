@@ -31,7 +31,11 @@
               <router-link :to="`/edit/${user.id}`">
                 <button type="button" class="btn btn-warning btn-sm mx-1">Edit</button>
               </router-link>
-              <button type="button" class="btn btn-danger btn-sm mx-1">Del</button>
+              <button
+                type="button"
+                class="btn btn-danger btn-sm mx-1"
+                @click="deleteUser(user.id)"
+              >Del</button>
             </td>
           </tr>
         </tbody>
@@ -56,43 +60,41 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, ref } from "vue";
+import { defineComponent, computed, onBeforeMount, reactive, ref } from "vue";
 import { useStore } from "vuex";
-import useAxios from "../composables/axios";
 
 export default defineComponent({
   setup() {
     const store = useStore();
-    const axios = useAxios();
 
-    const users = ref<any>([]);
+    const users = computed(() => {
+      return store.getters.getUsers;
+    });
+
     const error = reactive({
       status: false,
       msg: "",
     });
 
-    const count = computed(() => store.state.count);
-    (async () => {
-      try {
-        const { data } = await axios.get(
-          "https://jsonplaceholder.typicode.com/users"
-        );
-        if ((data as []).length) {
-          users.value = data;
-          error.status = false;
-        } else {
-          error.status = true;
-          error.msg = "Empty";
-        }
-      } catch (err) {
+    onBeforeMount(async () => {
+      await store.dispatch("reloadUsers");
+      if (users.value.length) {
+        error.status = false;
+      } else {
         error.status = true;
-        error.msg = "Server Error";
+        error.msg = "Empty";
       }
-    })();
+    });
+
+    const deleteUser = async (id: string) => {
+      store.dispatch("deleteUser", id);
+      await store.dispatch("reloadUsers");
+    };
 
     return {
       error,
       users,
+      deleteUser,
     };
   },
 });

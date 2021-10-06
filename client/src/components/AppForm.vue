@@ -47,8 +47,16 @@
 
 
 <script lang="ts">
-import { defineComponent, reactive, ref } from "vue";
-import useAxios from "../composables/axios";
+import { defineComponent, onBeforeMount, reactive, ref } from "vue";
+
+import { useStore } from "vuex";
+interface User {
+  name: string;
+  username: string;
+  email: string;
+  phone: string;
+  id: string;
+}
 
 export default defineComponent({
   props: {
@@ -63,7 +71,7 @@ export default defineComponent({
   },
   emits: ["submit"],
   setup(props, { emit }) {
-    const axios = useAxios();
+    const store = useStore();
     const status = ref<boolean>(false);
     const user = reactive({
       id: "",
@@ -74,23 +82,27 @@ export default defineComponent({
     });
 
     user.id = props.userId as string;
-    if (user.id) {
-      (async () => {
-        const { data } = await axios.get(
-          `https://jsonplaceholder.typicode.com/users/${user.id}`
-        );
-        const { name, username, email, phone } = data;
-
+    onBeforeMount(async () => {
+      const setUser = ({ name, username, email, phone }: User) => {
         user.name = name;
         user.username = username;
         user.email = email;
         user.phone = phone;
 
         status.value = true;
-      })();
-    } else {
-      status.value = true
-    }
+      };
+
+      if (user.id) {
+        if (store.getters.isReload) {
+          const data = store.getters.getuserWithID(user.id);
+          setUser(data);
+        } else {
+          await store.dispatch("reloadUsers");
+          const data = store.getters.getuserWithID(user.id);
+          setUser(data);
+        }
+      }
+    });
 
     const submit = () => {
       emit("submit", user);
