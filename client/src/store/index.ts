@@ -1,5 +1,6 @@
 import { createStore } from "vuex";
 import useAxios from "../composables/axios";
+const axios = useAxios("https://crud-app-api.vercel.app/");
 
 export interface State {
   users: Array<{
@@ -34,20 +35,16 @@ const store = createStore<State>({
   },
   actions: {
     async reloadUsers({ commit }) {
-      const axios = useAxios("http://localhost:8080");
       const { data } = await axios.post(`/users`);
       commit("SET_USERS", data);
     },
     async deleteUser({ }, id) {
-      const axios = useAxios("http://localhost:8080");
       await axios.delete(`/users/${id}`);
     },
     async addUser({}, user){
-      const axios = useAxios("http://localhost:8080");
       await axios.post(`/add`, user);
     },
     async editUser({}, user){
-      const axios = useAxios("http://localhost:8080");
       await axios.post(`/edit`, user);
     }
   },
