@@ -20,7 +20,7 @@
           </tr>
         </thead>
 
-        <tbody v-if="users.length">
+        <tbody v-if="users.length && !error.status">
           <tr v-for="user in users" :key="user.id">
             <th scope="row">{{ user.id }}</th>
             <td>{{ user.username }}</td>
@@ -38,13 +38,15 @@
       </table>
     </div>
     <!-- Loading  -->
-    <div v-if="!users.length" class="d-flex justify-content-center">
+    <div v-if="!users.length &&!error.status" class="d-flex justify-content-center">
       <div class="spinner-border my-5 text-primary" role="status">
         <span class="visually-hidden">Loading...</span>
       </div>
     </div>
 
-    <div>
+    <div class="alert alert-danger text-center mt-3" role="alert" v-if="error.status">{{error.msg}}</div>
+
+    <div v-if="users.length && !error.status">
       <h6>
         Total Users:
         <strong>({{ users.length }})</strong>
@@ -54,7 +56,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, ref } from "vue";
+import { computed, defineComponent, reactive, ref } from "vue";
 import { useStore } from "vuex";
 import useAxios from "../composables/axios";
 
@@ -64,17 +66,32 @@ export default defineComponent({
     const axios = useAxios();
 
     const users = ref<any>([]);
+    const error = reactive({
+      status: false,
+      msg: "",
+    });
 
     const count = computed(() => store.state.count);
     (async () => {
-      const todo = await axios.get(
-        "https://jsonplaceholder.typicode.com/users"
-      );
-      users.value = todo.data;
+      try {
+        const { data } = await axios.get(
+          "https://jsonplaceholder.typicode.com/users"
+        );
+        if ((data as []).length) {
+          users.value = data;
+          error.status = false;
+        } else {
+          error.status = true;
+          error.msg = "Empty";
+        }
+      } catch (err) {
+        error.status = true;
+        error.msg = "Server Error";
+      }
     })();
 
     return {
-      count,
+      error,
       users,
     };
   },
