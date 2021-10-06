@@ -1,5 +1,5 @@
 <template>
-  <AppForm label="Add User"  @submit="submit"/>
+  <AppForm label="Add User" @submit="submit" />
 </template>
 
 
@@ -14,15 +14,23 @@ interface User {
   id: string;
 }
 
+import { useStore } from "vuex";
+import { useRouter } from "vue-router";
 
 export default defineComponent({
   components: {
     AppForm,
   },
   setup() {
-    const submit = (user:User) => console.log(user);
+    const store = useStore();
+    const router = useRouter();
+
+    const submit = async (user: User) => {
+      await store.dispatch("addUser", user);
+      await router.push("/")
+    };
     return {
-      submit
+      submit,
     };
   },
 });

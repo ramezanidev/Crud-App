@@ -1,7 +1,8 @@
 const express = require("express");
-const cors = require("cors")
+const cors = require("cors");
 const app = express();
-app.use(cors())
+app.use(cors());
+app.use(express.json());
 
 let users = [
   {
@@ -58,7 +59,7 @@ let users = [
     name: "Nicholas Runolfsdottir V",
     username: "Maxime_Nienow",
     email: "Sherwood@rosamond.me",
-    phone: "586.493.6943 x140"
+    phone: "586.493.6943 x140",
   },
   {
     id: 9,
@@ -76,19 +77,42 @@ let users = [
   },
 ];
 
-
 app.post("/users", (req, res) => {
-    res.status(200).json(users)
+  res.status(200).json(users);
 });
 
 app.delete("/users/:id", (req, res) => {
-    const { id } = req.params;
-    if(id){
-        users = users.filter(user => user.id != id)
-        res.status(200)
-    } else {
-        res.status(400)
+  const { id } = req.params;
+  if (id) {
+    users = users.filter((user) => user.id != id);
+    res.status(200).end();
+  } else {
+    res.status(400).end();
+  }
+});
+
+app.post("/add", (req, res) => {
+  const user = req.body;
+  if (user) {
+    user.id = (users[users.length - 1]?.id || 0) + 1;
+    users.push(user);
+    return res.status(201).end();
+  }
+  res.status(400).end();
+});
+
+app.post("/edit", (req, res) => {
+  const data = req.body;
+  if (data?.id) {
+    for (let i = 0; i < users.length; i++) {
+      const user = users[i];
+      if (user.id == data.id) {
+        users[i] = data;
+         return res.status(200).end();
+      }
     }
+  }
+  res.status(400).end();
 });
 
 const port = process.env.PORT || 8080;

@@ -38,12 +38,17 @@ const store = createStore<State>({
       const { data } = await axios.post(`/users`);
       commit("SET_USERS", data);
     },
-    async deleteUser({ commit }, id) {
+    async deleteUser({ }, id) {
       const axios = useAxios("http://localhost:8080");
       await axios.delete(`/users/${id}`);
     },
-    async addUser(){
-      
+    async addUser({}, user){
+      const axios = useAxios("http://localhost:8080");
+      await axios.post(`/add`, user);
+    },
+    async editUser({}, user){
+      const axios = useAxios("http://localhost:8080");
+      await axios.post(`/edit`, user);
     }
   },
 });

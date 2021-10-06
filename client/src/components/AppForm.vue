@@ -101,6 +101,8 @@ export default defineComponent({
           const data = store.getters.getuserWithID(user.id);
           setUser(data);
         }
+      } else {
+        status.value = true;  
       }
     });
 

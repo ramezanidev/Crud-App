@@ -89,6 +89,12 @@ export default defineComponent({
     const deleteUser = async (id: string) => {
       store.dispatch("deleteUser", id);
       await store.dispatch("reloadUsers");
+      if (users.value.length) {
+        error.status = false;
+      } else {
+        error.status = true;
+        error.msg = "Empty";
+      }
     };
 
     return {
