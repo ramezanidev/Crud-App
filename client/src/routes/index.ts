@@ -1,21 +1,23 @@
-import {createRouter, createWebHistory, RouteRecordRaw, Router} from "vue-router";
+import {
+  createRouter,
+  createWebHistory,
+  RouteRecordRaw,
+  Router,
+} from "vue-router";
 
+const Home = () => import("../views/index.vue");
+const Edit = () => import("../views/edit.vue");
+const New = () => import("../views/new.vue");
 
-const Home = () => import('../views/index.vue');
-const About = () => import('../views/about.vue');
-
-
-const routes:Array<RouteRecordRaw> = [
+const routes: Array<RouteRecordRaw> = [
   { path: "/", component: Home },
-  { path: "/about", component: About },
+  { path: "/edit/:id", component: Edit },
+  { path: "/new", component: New },
 ];
 
-
-
-const router:Router = createRouter({
+const router: Router = createRouter({
   history: createWebHistory(),
-  routes, 
+  routes,
 });
 
-
-export default router
+export default router;
